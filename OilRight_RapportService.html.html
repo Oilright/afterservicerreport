@@ -1,0 +1,624 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OilRight – Rapport de service</title>
+<style>
+  :root {
+    --orange: #E87800;
+    --orange-light: #FFF3E0;
+    --dark: #1a1a1a;
+    --gray: #555;
+    --border: #ddd;
+    --line: #bbb;
+    --section-bg: #FAFAFA;
+    --check-ok: #2E7D32;
+    --check-warn: #E65100;
+    --check-na: #777;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: -apple-system, 'Helvetica Neue', Arial, sans-serif;
+    background: #eee;
+    color: var(--dark);
+    font-size: 14px;
+  }
+
+  .page {
+    width: 794px;
+    min-height: 1123px;
+    background: white;
+    margin: 20px auto;
+    padding: 36px 40px 40px;
+    box-shadow: 0 2px 16px rgba(0,0,0,0.12);
+  }
+
+  .header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 3px solid var(--orange);
+    padding-bottom: 18px;
+    margin-bottom: 22px;
+  }
+  .header-left { display: flex; align-items: center; gap: 14px; }
+  .logo { width: 60px; height: 60px; object-fit: contain; }
+  .brand-name { font-size: 26px; font-weight: 700; color: var(--orange); letter-spacing: -0.5px; }
+  .brand-tagline { font-size: 11px; color: var(--gray); margin-top: 2px; }
+  .header-right { text-align: right; }
+  .doc-title { font-size: 17px; font-weight: 700; color: var(--dark); }
+  .doc-subtitle { font-size: 11px; color: var(--gray); margin-top: 3px; }
+
+  .section {
+    background: var(--section-bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    margin-bottom: 14px;
+    overflow: hidden;
+  }
+  .section-header {
+    background: var(--orange);
+    color: white;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    padding: 7px 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .section-header .num {
+    background: rgba(255,255,255,0.25);
+    border-radius: 50%;
+    width: 20px; height: 20px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px;
+    flex-shrink: 0;
+  }
+  .section-body { padding: 12px 14px; }
+
+  .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px 20px; }
+  .info-grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px 20px; }
+  .field { display: flex; flex-direction: column; gap: 3px; }
+  .field label { font-size: 10px; font-weight: 700; color: var(--gray); text-transform: uppercase; letter-spacing: 0.4px; }
+  .write-line {
+    border: none;
+    border-bottom: 1.5px solid var(--line);
+    background: transparent;
+    height: 28px;
+    font-size: 13px;
+    padding: 2px 4px;
+    width: 100%;
+    outline: none;
+    font-family: inherit;
+    cursor: default;
+  }
+
+  .oil-row {
+    display: grid;
+    grid-template-columns: 2fr 1.2fr 1.5fr;
+    gap: 10px 16px;
+    align-items: end;
+  }
+
+  .check-group { margin-bottom: 8px; }
+  .check-group-title {
+    font-size: 11px; font-weight: 700; color: var(--orange);
+    text-transform: uppercase; letter-spacing: 0.4px;
+    margin-bottom: 5px; padding-bottom: 3px;
+    border-bottom: 1px solid #eee;
+  }
+  .check-items { display: flex; flex-direction: column; gap: 3px; }
+  .check-item { display: flex; align-items: center; gap: 8px; padding: 2px 0; }
+  .check-item span { font-size: 12px; flex: 1; color: var(--dark); }
+  .check-boxes { display: flex; gap: 5px; flex-shrink: 0; }
+  .cb-wrap { display: flex; flex-direction: column; align-items: center; gap: 1px; }
+  .cb-wrap .cb-label { font-size: 8px; text-transform: uppercase; letter-spacing: 0.3px; }
+  .cb { width: 17px; height: 17px; border-radius: 4px; border: 1.5px solid var(--line); background: white; flex-shrink: 0; }
+  .cb.ok   { border-color: var(--check-ok); }
+  .cb.warn { border-color: var(--check-warn); }
+  .cb.na   { border-color: var(--check-na); background: #f0f0f0; }
+
+  .obs-mini { display: flex; align-items: center; gap: 6px; margin-top: 5px; margin-bottom: 2px; }
+  .obs-mini-label { font-size: 9px; font-weight: 700; color: var(--gray); text-transform: uppercase; letter-spacing: 0.3px; white-space: nowrap; flex-shrink: 0; }
+  .obs-mini-line { flex: 1; border: none; border-bottom: 1px solid var(--line); height: 18px; background: transparent; }
+
+  .check-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0 20px; }
+
+  .legend {
+    display: flex; gap: 16px; align-items: center;
+    background: white; border: 1px solid var(--border);
+    border-radius: 6px; padding: 6px 12px; margin-bottom: 10px; flex-wrap: wrap;
+  }
+  .legend-title { font-size: 10px; font-weight: 700; color: var(--gray); text-transform: uppercase; margin-right: 4px; }
+  .leg-item { display: flex; align-items: center; gap: 5px; font-size: 11px; color: var(--gray); }
+  .leg-cb { width: 14px; height: 14px; border-radius: 3px; border: 1.5px solid; flex-shrink: 0; }
+
+  /* FORFAITS */
+  .forfait-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px; }
+  .forfait-card { border: 2px solid var(--border); border-radius: 8px; overflow: hidden; }
+  .forfait-card-header {
+    background: var(--dark); color: white;
+    padding: 8px 14px; display: flex; align-items: center; gap: 10px;
+  }
+  .forfait-num {
+    background: var(--orange); color: white; font-weight: 700; font-size: 18px;
+    width: 32px; height: 32px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+  }
+  .forfait-title { font-size: 12px; font-weight: 700; color: var(--orange); line-height: 1.3; }
+  .forfait-price { font-size: 14px; font-weight: 700; color: white; }
+  .forfait-body { padding: 10px 14px; background: white; }
+  .forfait-desc { font-size: 11px; color: var(--gray); margin-bottom: 8px; line-height: 1.4; }
+  .forfait-select {
+    display: flex; align-items: center; gap: 8px; padding: 7px 10px;
+    background: var(--orange-light); border: 1.5px solid var(--orange);
+    border-radius: 6px; font-size: 12px; font-weight: 700; color: var(--orange);
+    cursor: pointer; user-select: none;
+  }
+  .forfait-select .cb-sel {
+    width: 20px; height: 20px; border-radius: 4px;
+    border: 2px solid var(--orange); background: white;
+    flex-shrink: 0; display: flex; align-items: center; justify-content: center;
+    font-size: 14px; color: var(--orange); font-weight: 700;
+  }
+  .forfait-card.selected { border-color: var(--orange); }
+  .forfait-card.selected .forfait-card-header { background: var(--orange); }
+  .forfait-card.selected .forfait-num { background: white; color: var(--orange); }
+  .forfait-card.selected .forfait-title { color: white; }
+  .forfait-card.selected .forfait-select { background: var(--orange); color: white; }
+  .forfait-card.selected .cb-sel { background: white; }
+
+  .payment-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 16px; }
+  .payment-modes { display: flex; gap: 14px; flex-wrap: wrap; padding-top: 6px; }
+  .pay-opt { display: flex; align-items: center; gap: 5px; font-size: 12px; color: var(--dark); cursor: pointer; }
+  .pay-cb {
+    width: 18px; height: 18px; border-radius: 4px;
+    border: 1.5px solid var(--line); background: white; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px; color: var(--check-ok); font-weight: 700;
+  }
+  .pay-cb.checked { border-color: var(--check-ok); }
+
+  /* SIGNATURE CANVAS */
+  .sig-section { margin-top: 4px; }
+  .sig-label {
+    font-size: 10px; font-weight: 700; color: var(--gray);
+    text-transform: uppercase; letter-spacing: 0.3px; margin-bottom: 6px;
+  }
+  .sig-container {
+    position: relative;
+    border: 2px solid var(--line);
+    border-radius: 8px;
+    background: white;
+    overflow: hidden;
+  }
+  .sig-canvas {
+    display: block;
+    width: 100%;
+    height: 110px;
+    cursor: crosshair;
+    touch-action: none;
+  }
+  .sig-placeholder {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 12px; color: #ccc;
+    pointer-events: none;
+    text-align: center;
+    line-height: 1.5;
+  }
+  .sig-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 5px 10px;
+    background: #f5f5f5;
+    border-top: 1px solid var(--border);
+  }
+  .sig-toolbar-left { display: flex; align-items: center; gap: 10px; }
+  .sig-btn {
+    font-size: 11px; font-family: inherit;
+    border: 1px solid var(--border); border-radius: 4px;
+    padding: 3px 10px; background: white; cursor: pointer; color: var(--dark);
+  }
+  .sig-btn.clear { color: var(--check-warn); border-color: var(--check-warn); }
+  .sig-line-label { font-size: 9px; color: var(--gray); text-transform: uppercase; }
+  .sig-underline {
+    position: absolute;
+    bottom: 32px; left: 16px; right: 16px;
+    height: 1px; background: var(--line); pointer-events: none;
+  }
+
+  .footer {
+    margin-top: 18px; padding-top: 12px;
+    border-top: 1px solid #eee;
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  .footer-left { font-size: 10px; color: var(--gray); line-height: 1.6; }
+  .footer-right { font-size: 10px; color: var(--gray); text-align: right; line-height: 1.6; }
+
+  /* Floating buttons */
+  .fab-group {
+    position: fixed; bottom: 24px; right: 24px;
+    display: flex; flex-direction: column; gap: 10px; align-items: flex-end;
+    z-index: 999;
+  }
+  .fab {
+    border: none; border-radius: 50px;
+    padding: 13px 22px; font-size: 14px; font-weight: 700;
+    cursor: pointer; font-family: inherit;
+    display: flex; align-items: center; gap: 7px;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.18);
+  }
+  .fab-primary { background: var(--orange); color: white; }
+  .fab-secondary { background: white; color: var(--dark); border: 1.5px solid var(--border); font-size: 12px; padding: 9px 16px; }
+  .fab:active { transform: scale(0.96); }
+
+  @media print {
+    body { background: white; }
+    .page { margin: 0; box-shadow: none; width: 100%; padding: 24px 28px; }
+    .fab-group { display: none; }
+    .sig-toolbar { display: none; }
+    .sig-placeholder { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<div class="fab-group">
+  <button class="fab fab-primary" onclick="exportPDF()">⬇ Exporter PDF</button>
+  <button class="fab fab-secondary" onclick="clearAll()">🗑 Effacer tout</button>
+</div>
+
+<div class="page" id="page">
+
+  <!-- HEADER -->
+  <div class="header">
+    <div class="header-left">
+      <img class="logo" src="data:image/jpeg;base64,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" alt="OilRight logo">
+      <div>
+        <div class="brand-name">OilRight</div>
+        <div class="brand-tagline">Changement d'huile mobile · Grand Moncton</div>
+      </div>
+    </div>
+    <div class="header-right">
+      <div class="doc-title">Rapport de service</div>
+      <div class="doc-subtitle">Service report / Reçu</div>
+    </div>
+  </div>
+
+  <!-- 1. INFOS CLIENT & VÉHICULE -->
+  <div class="section">
+    <div class="section-header"><span class="num">1</span> Informations client &amp; véhicule</div>
+    <div class="section-body">
+      <div class="info-grid" style="margin-bottom:10px">
+        <div class="field"><label>Nom du client</label><div class="write-line"></div></div>
+        <div class="field"><label>Téléphone / Courriel</label><div class="write-line"></div></div>
+      </div>
+      <div class="info-grid-3" style="margin-bottom:10px">
+        <div class="field"><label>Marque &amp; Modèle</label><div class="write-line"></div></div>
+        <div class="field"><label>Année</label><div class="write-line"></div></div>
+        <div class="field"><label>Couleur</label><div class="write-line"></div></div>
+      </div>
+      <div class="info-grid-3">
+        <div class="field"><label>Plaque</label><div class="write-line"></div></div>
+        <div class="field"><label>VIN (partiel)</label><div class="write-line"></div></div>
+        <div class="field"><label>Date du service</label><div class="write-line"></div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 2. HUILE & ENTRETIEN -->
+  <div class="section">
+    <div class="section-header"><span class="num">2</span> Huile &amp; entretien</div>
+    <div class="section-body">
+      <div class="oil-row">
+        <div class="field"><label>Grade d'huile utilisé</label><div class="write-line"></div></div>
+        <div class="field"><label>Quantité (L)</label><div class="write-line"></div></div>
+        <div class="field"><label>No de filtre utilisé</label><div class="write-line"></div></div>
+      </div>
+      <div class="info-grid" style="margin-top:10px">
+        <div class="field"><label>Kilométrage actuel</label><div class="write-line"></div></div>
+        <div class="field"><label>Prochain entretien (km)</label><div class="write-line"></div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3. INSPECTION -->
+  <div class="section">
+    <div class="section-header"><span class="num">3</span> Inspection OIL P1T – Sécurité de base</div>
+    <div class="section-body">
+      <div class="legend">
+        <span class="legend-title">Légende :</span>
+        <div class="leg-item"><div class="leg-cb" style="border-color:var(--check-ok)"></div> OK</div>
+        <div class="leg-item"><div class="leg-cb" style="border-color:var(--check-warn)"></div> Attention</div>
+        <div class="leg-item"><div class="leg-cb" style="border-color:var(--check-na);background:#f0f0f0"></div> N/A</div>
+      </div>
+      <div class="check-grid">
+        <div>
+          <div class="check-group">
+            <div class="check-group-title">1. Fluides (visuel seulement)</div>
+            <div class="check-items">
+              <div class="check-item"><div class="check-boxes"><div class="cb-wrap"><div class="cb ok"></div><span class="cb-label" style="color:var(--check-ok)">OK</span></div><div class="cb-wrap"><div class="cb warn"></div><span class="cb-label" style="color:var(--check-warn)">⚠</span></div><div class="cb-wrap"><div class="cb na"></div><span class="cb-label" style="color:var(--check-na)">N/A</span></div></div><span>Liquide lave-glace (appoint si néc.)</span></div>
+              <div class="check-item"><div class="check-boxes"><div class="cb-wrap"><div class="cb ok"></div><span class="cb-label" style="color:var(--check-ok)">OK</span></div><div class="cb-wrap"><div class="cb warn"></div><span class="cb-label" style="color:var(--check-warn)">⚠</span></div><div class="cb-wrap"><div class="cb na"></div><span class="cb-label" style="color:var(--check-na)">N/A</span></div></div><span>Liquide de refroidissement</span></div>
+              <div class="check-item"><div class="check-boxes"><div class="cb-wrap"><div class="cb ok"></div><span class="cb-label" style="color:var(--check-ok)">OK</span></div><div class="cb-wrap"><div class="cb warn"></div><span class="cb-label" style="color:var(--check-warn)">⚠</span></div><div class="cb-wrap"><div class="cb na"></div><span class="cb-label" style="color:var(--check-na)">N/A</span></div></div><span>Liquide de frein</span></div>
+            </div>
+            <div class="obs-mini"><span class="obs-mini-label">Notes :</span><div class="obs-mini-line"></div></div>
+          </div>
+          <div class="check-group">
+            <div class="check-group-title">2. Pneus</div>
+            <div class="check-items">
+              <div class="check-item"><div class="check-boxes"><div class="cb-wrap"><div class="cb ok"></div><span class="cb-label" style="color:var(--check-ok)">OK</span></div><div class="cb-wrap"><div class="cb warn"></div><span class="cb-label" style="color:var(--check-warn)">⚠</span></div><div class="cb-wrap"><div class="cb na"></div><span class="cb-label" style="color:var(--check-na)">N/A</span></div></div><span>Pression (ajustée si nécessaire)</span></div>
+              <div class="check-item"><div class="check-boxes"><div class="cb-wrap"><div class="cb ok"></div><span class="cb-label" style="color:var(--check-ok)">OK</span></div><div class="cb-wrap"><div class="cb warn"></div><span class="cb-label" style="color:var(--check-warn)">⚠</span></div><div class="cb-wrap"><div class="cb na"></div><span class="cb-label" style="color:var(--check-na)">N/A</span></div></div><span>Profondeur bande de roulement</span></div>
+              <div class="check-item"><div class="check-boxes"><div class="cb-wrap"><div class="cb ok"></div><span class="cb-label" style="color:var(--check-ok)">OK</span></div><div class="cb-wrap"><div class="cb warn"></div><span class="cb-label" style="color:var(--check-warn)">⚠</span></div><div class="cb-wrap"><div class="cb na"></div><span class="cb-label" style="color:var(--check-na)">N/A</span></div></div><span>Craquelures, clous, bosses, usure inégale</span></div>
+            </div>
+            <div class="obs-mini"><span class="obs-mini-label">Notes :</span><div class="obs-mini-line"></div></div>
+          </div>
+          <div class="check-group">
+            <div class="check-group-title">3. Lumières &amp; signaux</div>
+            <div class="check-items">
+              <div class="check-item"><div class="check-boxes"><div class="cb-wrap"><div class="cb ok"></div><span class="cb-label" style="color:var(--check-ok)">OK</span></div><div class="cb-wrap"><div class="cb warn"></div><span class="cb-label" style="color:var(--check-warn)">⚠</span></div><div class="cb-wrap"><div class="cb na"></div><span class="cb-label" style="color:var(--check-na)">N/A</span></div></div><span>Phares (faibles &amp; feux de route)</span></div>
+              <div class="check-item"><div class="check-boxes"><div class="cb-wrap"><div class="cb ok"></div><span class="cb-label" style="color:var(--check-ok)">OK</span></div><div class="cb-wrap"><div class="cb warn"></div><span class="cb-label" style="color:var(--check-warn)">⚠</span></div><div class="cb-wrap"><div class="cb na"></div><span class="cb-label" style="color:var(--check-na)">N/A</span></div></div><span>Feux de jour (DRL)</span></div>
+              <div class="check-item"><div class="check-boxes"><div class="cb-wrap"><div class="cb ok"></div><span class="cb-label" style="color:var(--check-ok)">OK</span></div><div class="cb-wrap"><div class="cb warn"></div><span class="cb-label" style="color:var(--check-warn)">⚠</span></div><div class="cb-wrap"><div class="cb na"></div><span class="cb-label" style="color:var(--check-na)">N/A</span></div></div><span>Feux arrière &amp; frein</span></div>
+              <div class="check-item"><div class="check-boxes"><div class="cb-wrap"><div class="cb ok"></div><span class="cb-label" style="color:var(--check-ok)">OK</span></div><div class="cb-wrap"><div class="cb warn"></div><span class="cb-label" style="color:var(--check-warn)">⚠</span></div><div class="cb-wrap"><div class="cb na"></div><span class="cb-label" style="color:var(--check-na)">N/A</span></div></div><span>Clignotants</span></div>
+              <div class="check-item"><div class="check-boxes"><div class="cb-wrap"><div class="cb ok"></div><span class="cb-label" style="color:var(--check-ok)">OK</span></div><div class="cb-wrap"><div class="cb warn"></div><span class="cb-label" style="color:var(--check-warn)">⚠</span></div><div class="cb-wrap"><div class="cb na"></div><span class="cb-label" style="color:var(--check-na)">N/A</span></div></div><span>Feux de recul</span></div>
+            </div>
+            <div class="obs-mini"><span class="obs-mini-label">Notes :</span><div class="obs-mini-line"></div></div>
+          </div>
+          <div class="check-group">
+            <div class="check-group-title">4. Essuie-glaces &amp; pare-brise</div>
+            <div class="check-items">
+              <div class="check-item"><div class="check-boxes"><div class="cb-wrap"><div class="cb ok"></div><span class="cb-label" style="color:var(--check-ok)">OK</span></div><div class="cb-wrap"><div class="cb warn"></div><span class="cb-label" style="color:var(--check-warn)">⚠</span></div><div class="cb-wrap"><div class="cb na"></div><span class="cb-label" style="color:var(--check-na)">N/A</span></div></div><span>État des lames d'essuie-glace</span></div>
+              <div class="check-item"><div class="check-boxes"><div class="cb-wrap"><div class="cb ok"></div><span class="cb-label" style="color:var(--check-ok)">OK</span></div><div class="cb-wrap"><div class="cb warn"></div><span class="cb-label" style="color:var(--check-warn)">⚠</span></div><div class="cb-wrap"><div class="cb na"></div><span class="cb-label" style="color:var(--check-na)">N/A</span></div></div><span>Pare-brise (éclats ou fissures)</span></div>
+            </div>
+            <div class="obs-mini"><span class="obs-mini-label">Notes :</span><div class="obs-mini-line"></div></div>
+          </div>
+        </div>
+
+        <div>
+          <div class="check-group">
+            <div class="check-group-title">5. Batterie (visuel seulement)</div>
+            <div class="check-items">
+              <div class="check-item"><div class="check-boxes"><div class="cb-wrap"><div class="cb ok"></div><span class="cb-label" style="color:var(--check-ok)">OK</span></div><div class="cb-wrap"><div class="cb warn"></div><span class="cb-label" style="color:var(--check-warn)">⚠</span></div><div class="cb-wrap"><div class="cb na"></div><span class="cb-label" style="color:var(--check-na)">N/A</span></div></div><span>Corrosion sur les bornes</span></div>
+              <div class="check-item"><div class="check-boxes"><div class="cb-wrap"><div class="cb ok"></div><span class="cb-label" style="color:var(--check-ok)">OK</span></div><div class="cb-wrap"><div class="cb warn"></div><span class="cb-label" style="color:var(--check-warn)">⚠</span></div><div class="cb-wrap"><div class="cb na"></div><span class="cb-label" style="color:var(--check-na)">N/A</span></div></div><span>Gonflement ou fuite visible</span></div>
+            </div>
+            <div class="obs-mini"><span class="obs-mini-label">Notes :</span><div class="obs-mini-line"></div></div>
+          </div>
+          <div class="check-group">
+            <div class="check-group-title">6. Sous le capot</div>
+            <div class="check-items">
+              <div class="check-item"><div class="check-boxes"><div class="cb-wrap"><div class="cb ok"></div><span class="cb-label" style="color:var(--check-ok)">OK</span></div><div class="cb-wrap"><div class="cb warn"></div><span class="cb-label" style="color:var(--check-warn)">⚠</span></div><div class="cb-wrap"><div class="cb na"></div><span class="cb-label" style="color:var(--check-na)">N/A</span></div></div><span>Courroies (craquelures visuelles)</span></div>
+              <div class="check-item"><div class="check-boxes"><div class="cb-wrap"><div class="cb ok"></div><span class="cb-label" style="color:var(--check-ok)">OK</span></div><div class="cb-wrap"><div class="cb warn"></div><span class="cb-label" style="color:var(--check-warn)">⚠</span></div><div class="cb-wrap"><div class="cb na"></div><span class="cb-label" style="color:var(--check-na)">N/A</span></div></div><span>Boyaux (fuites / bosses visuelles)</span></div>
+            </div>
+            <div class="obs-mini"><span class="obs-mini-label">Notes :</span><div class="obs-mini-line"></div></div>
+          </div>
+          <div class="check-group">
+            <div class="check-group-title">7. Sous le véhicule</div>
+            <div class="check-items">
+              <div class="check-item"><div class="check-boxes"><div class="cb-wrap"><div class="cb ok"></div><span class="cb-label" style="color:var(--check-ok)">OK</span></div><div class="cb-wrap"><div class="cb warn"></div><span class="cb-label" style="color:var(--check-warn)">⚠</span></div><div class="cb-wrap"><div class="cb na"></div><span class="cb-label" style="color:var(--check-na)">N/A</span></div></div><span>Fuites fraîches (huile, liquide refr.)</span></div>
+              <div class="check-item"><div class="check-boxes"><div class="cb-wrap"><div class="cb ok"></div><span class="cb-label" style="color:var(--check-ok)">OK</span></div><div class="cb-wrap"><div class="cb warn"></div><span class="cb-label" style="color:var(--check-warn)">⚠</span></div><div class="cb-wrap"><div class="cb na"></div><span class="cb-label" style="color:var(--check-na)">N/A</span></div></div><span>Rouille sur zones critiques visibles</span></div>
+              <div class="check-item"><div class="check-boxes"><div class="cb-wrap"><div class="cb ok"></div><span class="cb-label" style="color:var(--check-ok)">OK</span></div><div class="cb-wrap"><div class="cb warn"></div><span class="cb-label" style="color:var(--check-warn)">⚠</span></div><div class="cb-wrap"><div class="cb na"></div><span class="cb-label" style="color:var(--check-na)">N/A</span></div></div><span>Plastiques de protection desserrés</span></div>
+            </div>
+            <div class="obs-mini"><span class="obs-mini-label">Notes :</span><div class="obs-mini-line"></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 4. FORFAIT & PAIEMENT -->
+  <div class="section">
+    <div class="section-header"><span class="num">4</span> Forfait &amp; paiement</div>
+    <div class="section-body">
+
+      <div class="forfait-row">
+        <div class="forfait-card" id="card1" onclick="selectForfait(1)">
+          <div class="forfait-card-header">
+            <div class="forfait-num">1</div>
+            <div>
+              <div class="forfait-title">5L OIL P1T PACKAGE</div>
+              <div class="forfait-price">119,99 $</div>
+            </div>
+          </div>
+          <div class="forfait-body">
+            <div class="forfait-desc">Véhicules requérant 5L ou moins. (Civic, Corolla, Elantra, Mazda 3, HR-V, Kicks, Golf…)</div>
+            <div class="forfait-select">
+              <div class="cb-sel" id="sel1"></div>
+              Sélectionner ce forfait
+            </div>
+          </div>
+        </div>
+        <div class="forfait-card" id="card2" onclick="selectForfait(2)">
+          <div class="forfait-card-header">
+            <div class="forfait-num">2</div>
+            <div>
+              <div class="forfait-title">6L+ OIL P1T PACKAGE</div>
+              <div class="forfait-price">139,99 $</div>
+            </div>
+          </div>
+          <div class="forfait-body">
+            <div class="forfait-desc">Véhicules requérant 6L ou plus. (RAV4, CR-V, F-150, Silverado, RAM 1500, Highlander…)</div>
+            <div class="forfait-select">
+              <div class="cb-sel" id="sel2"></div>
+              Sélectionner ce forfait
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="payment-row">
+        <div class="field">
+          <label>Mode de paiement</label>
+          <div class="payment-modes">
+            <div class="pay-opt" onclick="togglePay(this)"><div class="pay-cb"></div> Virement</div>
+            <div class="pay-opt" onclick="togglePay(this)"><div class="pay-cb"></div> Comptant</div>
+            <div class="pay-opt" onclick="togglePay(this)"><div class="pay-cb"></div> Carte</div>
+          </div>
+        </div>
+        <div class="field">
+          <label>No de confirmation / référence</label>
+          <div class="write-line"></div>
+        </div>
+      </div>
+
+      <!-- SIGNATURE CANVAS -->
+      <div class="sig-section">
+        <div class="sig-label">Signature du client</div>
+        <div class="sig-container">
+          <canvas class="sig-canvas" id="sigCanvas"></canvas>
+          <div class="sig-underline"></div>
+          <div class="sig-placeholder" id="sigPlaceholder">✏️ Signez ici avec l'Apple Pencil<br><span style="font-size:10px;color:#ddd">Touchez pour commencer</span></div>
+          <div class="sig-toolbar">
+            <div class="sig-toolbar-left">
+              <span class="sig-line-label">Épaisseur :</span>
+              <input type="range" id="penSize" min="1" max="5" value="2" style="width:70px">
+            </div>
+            <button class="sig-btn clear" onclick="clearSig()">✕ Effacer</button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <div class="footer">
+    <div class="footer-left">
+      OilRight – Service mobile · Grand Moncton, N.-B.<br>
+      Ce rapport confirme la réalisation du service décrit ci-dessus.
+    </div>
+    <div class="footer-right">
+      Merci pour votre confiance !<br>
+      <strong style="color:var(--orange)">OilRight</strong>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  // ── FORFAIT SELECTION ──
+  function selectForfait(n) {
+    [1,2].forEach(i => {
+      document.getElementById('card'+i).classList.remove('selected');
+      document.getElementById('sel'+i).textContent = '';
+    });
+    document.getElementById('card'+n).classList.add('selected');
+    document.getElementById('sel'+n).textContent = '✓';
+  }
+
+  // ── PAYMENT TOGGLE ──
+  function togglePay(el) {
+    const cb = el.querySelector('.pay-cb');
+    const active = cb.classList.contains('checked');
+    document.querySelectorAll('.pay-cb').forEach(c => { c.classList.remove('checked'); c.textContent = ''; });
+    if (!active) { cb.classList.add('checked'); cb.textContent = '✓'; }
+  }
+
+  // ── SIGNATURE CANVAS ──
+  const canvas = document.getElementById('sigCanvas');
+  const ctx = canvas.getContext('2d');
+  const placeholder = document.getElementById('sigPlaceholder');
+  let drawing = false;
+  let hasSig = false;
+
+  function resizeCanvas() {
+    const rect = canvas.getBoundingClientRect();
+    const dpr = window.devicePixelRatio || 1;
+    // Save existing drawing
+    const img = canvas.toDataURL();
+    canvas.width = rect.width * dpr;
+    canvas.height = rect.height * dpr;
+    ctx.scale(dpr, dpr);
+    ctx.strokeStyle = '#1a1a1a';
+    ctx.lineJoin = 'round';
+    ctx.lineCap = 'round';
+    // Restore
+    if (hasSig) {
+      const image = new Image();
+      image.onload = () => ctx.drawImage(image, 0, 0, rect.width, rect.height);
+      image.src = img;
+    }
+  }
+
+  function getPos(e) {
+    const rect = canvas.getBoundingClientRect();
+    const src = e.touches ? e.touches[0] : (e.pointerType !== undefined ? e : e);
+    return {
+      x: (src.clientX - rect.left),
+      y: (src.clientY - rect.top)
+    };
+  }
+
+  function startDraw(e) {
+    e.preventDefault();
+    drawing = true;
+    const pos = getPos(e);
+    ctx.beginPath();
+    ctx.moveTo(pos.x, pos.y);
+    if (!hasSig) { placeholder.style.display = 'none'; hasSig = true; }
+  }
+
+  function draw(e) {
+    if (!drawing) return;
+    e.preventDefault();
+    const pos = getPos(e);
+    ctx.lineWidth = document.getElementById('penSize').value;
+    ctx.strokeStyle = '#1a1a1a';
+    ctx.lineJoin = 'round';
+    ctx.lineCap = 'round';
+    ctx.lineTo(pos.x, pos.y);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(pos.x, pos.y);
+  }
+
+  function endDraw(e) {
+    drawing = false;
+    ctx.beginPath();
+  }
+
+  function clearSig() {
+    const rect = canvas.getBoundingClientRect();
+    ctx.clearRect(0, 0, rect.width, rect.height);
+    hasSig = false;
+    placeholder.style.display = '';
+  }
+
+  // Pointer events (Apple Pencil uses pointer events)
+  canvas.addEventListener('pointerdown', startDraw, { passive: false });
+  canvas.addEventListener('pointermove', draw, { passive: false });
+  canvas.addEventListener('pointerup', endDraw);
+  canvas.addEventListener('pointercancel', endDraw);
+  // Touch fallback
+  canvas.addEventListener('touchstart', startDraw, { passive: false });
+  canvas.addEventListener('touchmove', draw, { passive: false });
+  canvas.addEventListener('touchend', endDraw);
+
+  window.addEventListener('resize', resizeCanvas);
+  setTimeout(resizeCanvas, 100);
+
+  // ── EXPORT PDF ──
+  function exportPDF() {
+    window.print();
+  }
+
+  // ── CLEAR ALL ──
+  function clearAll() {
+    if (!confirm('Effacer tout le formulaire ?')) return;
+    document.querySelectorAll('.write-line').forEach(el => el.textContent = '');
+    [1,2].forEach(i => {
+      document.getElementById('card'+i).classList.remove('selected');
+      document.getElementById('sel'+i).textContent = '';
+    });
+    document.querySelectorAll('.pay-cb').forEach(c => { c.classList.remove('checked'); c.textContent = ''; });
+    clearSig();
+  }
+</script>
+</body>
+</html>
