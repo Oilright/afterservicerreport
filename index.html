@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OilRight – Service Report</title>
+<style>
+  :root {
+    --orange: #E87800;
+    --orange-light: #FFF3E0;
+    --dark: #1a1a1a;
+    --gray: #555;
+    --border: #ddd;
+    --line: #bbb;
+    --section-bg: #FAFAFA;
+    --ok: #2E7D32;
+    --warn: #E65100;
+    --na: #777;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, 'Helvetica Neue', Arial, sans-serif; background: #e8e8e8; color: var(--dark); font-size: 15px; }
+
+  .page { max-width: 820px; background: white; margin: 16px auto; padding: 32px 36px 40px; box-shadow: 0 2px 20px rgba(0,0,0,0.13); border-radius: 6px; }
+
+  /* HEADER */
+  .header { display: flex; align-items: center; justify-content: space-between; border-bottom: 3px solid var(--orange); padding-bottom: 16px; margin-bottom: 20px; }
+  .header-left { display: flex; align-items: center; gap: 14px; }
+  .logo { width: 56px; height: 56px; object-fit: contain; }
+  .brand-name { font-size: 24px; font-weight: 700; color: var(--orange); }
+  .brand-tagline { font-size: 11px; color: var(--gray); margin-top: 2px; }
+  .doc-title { font-size: 16px; font-weight: 700; text-align: right; }
+  .doc-sub { font-size: 11px; color: var(--gray); text-align: right; margin-top: 2px; }
+
+  /* SECTIONS */
+  .section { border: 1px solid var(--border); border-radius: 8px; margin-bottom: 14px; overflow: hidden; background: var(--section-bg); }
+  .sec-hdr { background: var(--orange); color: white; padding: 8px 14px; display: flex; align-items: center; gap: 10px; }
+  .sec-num { background: rgba(255,255,255,0.3); border-radius: 50%; width: 22px; height: 22px; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; flex-shrink: 0; }
+  .sec-title { font-size: 11px; font-weight: 700; letter-spacing: 0.6px; text-transform: uppercase; }
+  .sec-body { padding: 14px 16px; }
+
+  /* GRIDS */
+  .g2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px 20px; margin-bottom: 12px; }
+  .g3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px 16px; margin-bottom: 12px; }
+  .g3-oil { display: grid; grid-template-columns: 2fr 1fr 1.4fr; gap: 12px 16px; margin-bottom: 12px; }
+  .g2:last-child, .g3:last-child, .g3-oil:last-child { margin-bottom: 0; }
+
+  /* FIELD */
+  .field { display: flex; flex-direction: column; gap: 4px; }
+  .field label { font-size: 10px; font-weight: 700; color: var(--gray); text-transform: uppercase; letter-spacing: 0.5px; }
+  .field input[type="text"],
+  .field input[type="date"] {
+    border: none;
+    border-bottom: 2px solid var(--line);
+    background: transparent;
+    font-size: 14px;
+    font-family: inherit;
+    color: var(--dark);
+    padding: 4px 2px;
+    outline: none;
+    width: 100%;
+    border-radius: 0;
+    -webkit-appearance: none;
+  }
+  .field input[type="text"]:focus,
+  .field input[type="date"]:focus { border-bottom-color: var(--orange); }
+
+  /* INSPECTION GRID */
+  .insp-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0 24px; }
+
+  /* CHECK GROUP */
+  .chk-grp { margin-bottom: 10px; }
+  .chk-grp-title { font-size: 10.5px; font-weight: 700; color: var(--orange); text-transform: uppercase; letter-spacing: 0.4px; padding-bottom: 4px; border-bottom: 1px solid #eee; margin-bottom: 6px; }
+
+  /* CHECK ITEM — real radio buttons styled */
+  .chk-item { display: flex; align-items: center; gap: 10px; padding: 3px 0; }
+  .chk-item-label { font-size: 12.5px; flex: 1; }
+  .radio-group { display: flex; gap: 6px; flex-shrink: 0; }
+  .radio-opt { display: flex; flex-direction: column; align-items: center; gap: 2px; cursor: pointer; }
+  .radio-opt input[type="radio"] { display: none; }
+  .radio-btn {
+    width: 20px; height: 20px; border-radius: 4px; border: 2px solid var(--line);
+    background: white; display: flex; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: 700; transition: all 0.15s; flex-shrink: 0;
+  }
+  .radio-opt.ok   .radio-btn { border-color: var(--ok); }
+  .radio-opt.warn .radio-btn { border-color: var(--warn); }
+  .radio-opt.na   .radio-btn { border-color: var(--na); background: #f0f0f0; }
+  .radio-opt input:checked ~ .radio-btn { color: white; }
+  .radio-opt.ok   input:checked ~ .radio-btn { background: var(--ok); border-color: var(--ok); }
+  .radio-opt.warn input:checked ~ .radio-btn { background: var(--warn); border-color: var(--warn); }
+  .radio-opt.na   input:checked ~ .radio-btn { background: var(--na); border-color: var(--na); }
+  .radio-lbl { font-size: 8px; text-transform: uppercase; color: var(--gray); }
+
+  /* LEGEND */
+  .legend { display: flex; gap: 18px; align-items: center; background: white; border: 1px solid var(--border); border-radius: 6px; padding: 7px 12px; margin-bottom: 12px; }
+  .legend-title { font-size: 10px; font-weight: 700; color: var(--gray); text-transform: uppercase; }
+  .leg-item { display: flex; align-items: center; gap: 6px; font-size: 11px; color: var(--gray); }
+  .leg-dot { width: 14px; height: 14px; border-radius: 3px; border: 2px solid; flex-shrink: 0; }
+
+  /* NOTES LINE */
+  .notes-row { display: flex; align-items: center; gap: 8px; margin-top: 6px; margin-bottom: 2px; }
+  .notes-lbl { font-size: 9px; font-weight: 700; color: var(--gray); text-transform: uppercase; white-space: nowrap; }
+  .notes-row input[type="text"] { flex: 1; border: none; border-bottom: 1px solid var(--line); background: transparent; font-size: 12px; font-family: inherit; outline: none; padding: 2px 0; border-radius: 0; -webkit-appearance: none; }
+  .notes-row input[type="text"]:focus { border-bottom-color: var(--orange); }
+
+  /* PACKAGES */
+  .pkg-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 16px; }
+  .pkg-card { border: 2px solid var(--border); border-radius: 8px; overflow: hidden; cursor: pointer; transition: border-color 0.15s; }
+  .pkg-card.selected { border-color: var(--orange); }
+  .pkg-hdr { background: var(--dark); padding: 10px 14px; display: flex; align-items: center; gap: 12px; transition: background 0.15s; }
+  .pkg-card.selected .pkg-hdr { background: var(--orange); }
+  .pkg-num { background: var(--orange); color: white; font-weight: 700; font-size: 18px; width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: background 0.15s; }
+  .pkg-card.selected .pkg-num { background: white; color: var(--orange); }
+  .pkg-name { font-size: 12px; font-weight: 700; color: var(--orange); line-height: 1.3; }
+  .pkg-card.selected .pkg-name { color: white; }
+  .pkg-price { font-size: 15px; font-weight: 700; color: white; }
+  .pkg-body { padding: 10px 14px; background: white; }
+  .pkg-desc { font-size: 11px; color: var(--gray); margin-bottom: 10px; line-height: 1.5; }
+  .pkg-sel { display: flex; align-items: center; gap: 8px; padding: 8px 10px; background: var(--orange-light); border: 1.5px solid var(--orange); border-radius: 6px; font-size: 12px; font-weight: 700; color: var(--orange); transition: all 0.15s; }
+  .pkg-card.selected .pkg-sel { background: var(--orange); color: white; }
+  .pkg-check { width: 20px; height: 20px; border-radius: 4px; border: 2px solid var(--orange); background: white; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; color: var(--orange); flex-shrink: 0; }
+  .pkg-card.selected .pkg-check { background: white; color: var(--orange); }
+
+  /* PAYMENT */
+  .pay-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 16px; }
+  .pay-methods { display: flex; gap: 16px; flex-wrap: wrap; padding-top: 6px; }
+  .pay-opt { display: flex; align-items: center; gap: 7px; cursor: pointer; font-size: 13px; }
+  .pay-opt input[type="radio"] { display: none; }
+  .pay-btn { width: 20px; height: 20px; border-radius: 4px; border: 2px solid var(--line); background: white; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; flex-shrink: 0; }
+  .pay-opt input:checked ~ .pay-btn { background: var(--ok); border-color: var(--ok); }
+
+  /* SIGNATURE */
+  .sig-label { font-size: 10px; font-weight: 700; color: var(--gray); text-transform: uppercase; letter-spacing: 0.4px; margin-bottom: 6px; }
+  .sig-wrap { border: 2px solid var(--line); border-radius: 8px; background: white; overflow: hidden; position: relative; }
+  .sig-canvas { display: block; width: 100%; height: 120px; touch-action: none; cursor: crosshair; }
+  .sig-hint { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: #ccc; font-size: 13px; text-align: center; pointer-events: none; line-height: 1.6; }
+  .sig-line { position: absolute; bottom: 36px; left: 20px; right: 20px; height: 1px; background: var(--line); pointer-events: none; }
+  .sig-bar { display: flex; justify-content: space-between; align-items: center; padding: 6px 12px; background: #f5f5f5; border-top: 1px solid var(--border); }
+  .sig-bar-left { display: flex; align-items: center; gap: 8px; font-size: 11px; color: var(--gray); }
+  .sig-clear { font-size: 11px; font-family: inherit; border: 1px solid var(--warn); border-radius: 4px; padding: 4px 12px; background: white; color: var(--warn); cursor: pointer; }
+
+  /* FOOTER */
+  .footer { margin-top: 20px; padding-top: 14px; border-top: 1px solid #eee; display: flex; justify-content: space-between; align-items: flex-start; }
+  .footer-l { font-size: 10px; color: var(--gray); line-height: 1.7; }
+  .footer-r { font-size: 10px; color: var(--gray); text-align: right; line-height: 1.7; }
+
+  /* FABs */
+  .fabs { position: fixed; bottom: 24px; right: 20px; display: flex; flex-direction: column; gap: 10px; align-items: flex-end; z-index: 999; }
+  .fab { border: none; border-radius: 50px; padding: 14px 24px; font-size: 14px; font-weight: 700; cursor: pointer; font-family: inherit; box-shadow: 0 4px 16px rgba(0,0,0,0.2); }
+  .fab-p { background: var(--orange); color: white; }
+  .fab-s { background: white; color: var(--dark); border: 1.5px solid var(--border); font-size: 12px; padding: 10px 18px; }
+
+  @media print {
+    body { background: white; }
+    .page { margin: 0; box-shadow: none; padding: 20px 24px; }
+    .fabs, .sig-bar { display: none; }
+    .sig-hint { display: none; }
+  }
+
+  @media (max-width: 600px) {
+    .page { margin: 8px; padding: 20px 16px; }
+    .g3, .g3-oil, .insp-grid, .pkg-row, .pay-row { grid-template-columns: 1fr; }
+    .g2 { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<div class="fabs">
+  <button class="fab fab-p" onclick="window.print()">⬇ Export PDF</button>
+  <button class="fab fab-s" onclick="clearAll()">🗑 Clear</button>
+</div>
+
+<div class="page">
+
+  <!-- HEADER -->
+  <div class="header">
+    <div class="header-left">
+      <img class="logo" src="data:image/jpeg;base64,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" alt="OilRight">
+      <div>
+        <div class="brand-name">OilRight</div>
+        <div class="brand-tagline">Mobile Oil Change · Greater Moncton</div>
+      </div>
+    </div>
+    <div>
+      <div class="doc-title">Service Report</div>
+      <div class="doc-sub">Rapport de service / Receipt</div>
+    </div>
+  </div>
+
+  <!-- 1. CLIENT & VEHICLE -->
+  <div class="section">
+    <div class="sec-hdr"><span class="sec-num">1</span><span class="sec-title">Client &amp; Vehicle Information</span></div>
+    <div class="sec-body">
+      <div class="g2">
+        <div class="field"><label>Client Name</label><input type="text" placeholder="Full name" autocomplete="off"></div>
+        <div class="field"><label>Phone / Email</label><input type="text" placeholder="Contact info" autocomplete="off"></div>
+      </div>
+      <div class="g3">
+        <div class="field"><label>Make &amp; Model</label><input type="text" placeholder="e.g. Honda Civic" autocomplete="off"></div>
+        <div class="field"><label>Year</label><input type="text" placeholder="e.g. 2021" autocomplete="off"></div>
+        <div class="field"><label>Color</label><input type="text" placeholder="e.g. Blue" autocomplete="off"></div>
+      </div>
+      <div class="g3">
+        <div class="field"><label>License Plate</label><input type="text" placeholder="e.g. ABC 123" autocomplete="off"></div>
+        <div class="field"><label>VIN (partial)</label><input type="text" placeholder="Last 6 digits" autocomplete="off"></div>
+        <div class="field"><label>Service Date</label><input type="date" autocomplete="off"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 2. OIL & SERVICE -->
+  <div class="section">
+    <div class="sec-hdr"><span class="sec-num">2</span><span class="sec-title">Oil &amp; Service Details</span></div>
+    <div class="sec-body">
+      <div class="g3-oil">
+        <div class="field"><label>Oil Grade Used</label><input type="text" placeholder="e.g. 5W-30 Full Synthetic" autocomplete="off"></div>
+        <div class="field"><label>Quantity (L)</label><input type="text" placeholder="e.g. 5" autocomplete="off"></div>
+        <div class="field"><label>Filter Part No.</label><input type="text" placeholder="e.g. PH3614" autocomplete="off"></div>
+      </div>
+      <div class="g2">
+        <div class="field"><label>Current Mileage (km)</label><input type="text" placeholder="e.g. 85,400" autocomplete="off"></div>
+        <div class="field"><label>Next Service (km)</label><input type="text" placeholder="e.g. 90,400" autocomplete="off"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3. INSPECTION -->
+  <div class="section">
+    <div class="sec-hdr"><span class="sec-num">3</span><span class="sec-title">OilRight Inspection – Basic Safety Check</span></div>
+    <div class="sec-body">
+      <div class="legend">
+        <span class="legend-title">Legend:</span>
+        <div class="leg-item"><div class="leg-dot" style="border-color:var(--ok)"></div> OK</div>
+        <div class="leg-item"><div class="leg-dot" style="border-color:var(--warn)"></div> Attention</div>
+        <div class="leg-item"><div class="leg-dot" style="border-color:var(--na);background:#f0f0f0"></div> N/A</div>
+      </div>
+
+      <div class="insp-grid">
+        <!-- LEFT -->
+        <div>
+
+          <div class="chk-grp">
+            <div class="chk-grp-title">1. Fluids (visual only)</div>
+            <div class="chk-item">
+              <span class="chk-item-label">Windshield washer fluid</span>
+              <div class="radio-group">
+                <label class="radio-opt ok"><input type="radio" name="f1" value="ok"><div class="radio-btn">✓</div><span class="radio-lbl">OK</span></label>
+                <label class="radio-opt warn"><input type="radio" name="f1" value="warn"><div class="radio-btn">!</div><span class="radio-lbl">Attn</span></label>
+                <label class="radio-opt na"><input type="radio" name="f1" value="na"><div class="radio-btn">–</div><span class="radio-lbl">N/A</span></label>
+              </div>
+            </div>
+            <div class="chk-item">
+              <span class="chk-item-label">Coolant level</span>
+              <div class="radio-group">
+                <label class="radio-opt ok"><input type="radio" name="f2" value="ok"><div class="radio-btn">✓</div><span class="radio-lbl">OK</span></label>
+                <label class="radio-opt warn"><input type="radio" name="f2" value="warn"><div class="radio-btn">!</div><span class="radio-lbl">Attn</span></label>
+                <label class="radio-opt na"><input type="radio" name="f2" value="na"><div class="radio-btn">–</div><span class="radio-lbl">N/A</span></label>
+              </div>
+            </div>
+            <div class="chk-item">
+              <span class="chk-item-label">Brake fluid level</span>
+              <div class="radio-group">
+                <label class="radio-opt ok"><input type="radio" name="f3" value="ok"><div class="radio-btn">✓</div><span class="radio-lbl">OK</span></label>
+                <label class="radio-opt warn"><input type="radio" name="f3" value="warn"><div class="radio-btn">!</div><span class="radio-lbl">Attn</span></label>
+                <label class="radio-opt na"><input type="radio" name="f3" value="na"><div class="radio-btn">–</div><span class="radio-lbl">N/A</span></label>
+              </div>
+            </div>
+            <div class="notes-row"><span class="notes-lbl">Notes:</span><input type="text" placeholder="..." autocomplete="off"></div>
+          </div>
+
+          <div class="chk-grp">
+            <div class="chk-grp-title">2. Tires</div>
+            <div class="chk-item">
+              <span class="chk-item-label">Tire pressure (adjusted if needed)</span>
+              <div class="radio-group">
+                <label class="radio-opt ok"><input type="radio" name="t1" value="ok"><div class="radio-btn">✓</div><span class="radio-lbl">OK</span></label>
+                <label class="radio-opt warn"><input type="radio" name="t1" value="warn"><div class="radio-btn">!</div><span class="radio-lbl">Attn</span></label>
+                <label class="radio-opt na"><input type="radio" name="t1" value="na"><div class="radio-btn">–</div><span class="radio-lbl">N/A</span></label>
+              </div>
+            </div>
+            <div class="chk-item">
+              <span class="chk-item-label">Tread depth</span>
+              <div class="radio-group">
+                <label class="radio-opt ok"><input type="radio" name="t2" value="ok"><div class="radio-btn">✓</div><span class="radio-lbl">OK</span></label>
+                <label class="radio-opt warn"><input type="radio" name="t2" value="warn"><div class="radio-btn">!</div><span class="radio-lbl">Attn</span></label>
+                <label class="radio-opt na"><input type="radio" name="t2" value="na"><div class="radio-btn">–</div><span class="radio-lbl">N/A</span></label>
+              </div>
+            </div>
+            <div class="chk-item">
+              <span class="chk-item-label">Cracks, nails, bulges, uneven wear</span>
+              <div class="radio-group">
+                <label class="radio-opt ok"><input type="radio" name="t3" value="ok"><div class="radio-btn">✓</div><span class="radio-lbl">OK</span></label>
+                <label class="radio-opt warn"><input type="radio" name="t3" value="warn"><div class="radio-btn">!</div><span class="radio-lbl">Attn</span></label>
+                <label class="radio-opt na"><input type="radio" name="t3" value="na"><div class="radio-btn">–</div><span class="radio-lbl">N/A</span></label>
+              </div>
+            </div>
+            <div class="notes-row"><span class="notes-lbl">Notes:</span><input type="text" placeholder="..." autocomplete="off"></div>
+          </div>
+
+          <div class="chk-grp">
+            <div class="chk-grp-title">3. Lights &amp; Signals</div>
+            <div class="chk-item">
+              <span class="chk-item-label">Headlights (low &amp; high beam)</span>
+              <div class="radio-group">
+                <label class="radio-opt ok"><input type="radio" name="l1" value="ok"><div class="radio-btn">✓</div><span class="radio-lbl">OK</span></label>
+                <label class="radio-opt warn"><input type="radio" name="l1" value="warn"><div class="radio-btn">!</div><span class="radio-lbl">Attn</span></label>
+                <label class="radio-opt na"><input type="radio" name="l1" value="na"><div class="radio-btn">–</div><span class="radio-lbl">N/A</span></label>
+              </div>
+            </div>
+            <div class="chk-item">
+              <span class="chk-item-label">Daytime running lights (DRL)</span>
+              <div class="radio-group">
+                <label class="radio-opt ok"><input type="radio" name="l2" value="ok"><div class="radio-btn">✓</div><span class="radio-lbl">OK</span></label>
+                <label class="radio-opt warn"><input type="radio" name="l2" value="warn"><div class="radio-btn">!</div><span class="radio-lbl">Attn</span></label>
+                <label class="radio-opt na"><input type="radio" name="l2" value="na"><div class="radio-btn">–</div><span class="radio-lbl">N/A</span></label>
+              </div>
+            </div>
+            <div class="chk-item">
+              <span class="chk-item-label">Tail lights &amp; brake lights</span>
+              <div class="radio-group">
+                <label class="radio-opt ok"><input type="radio" name="l3" value="ok"><div class="radio-btn">✓</div><span class="radio-lbl">OK</span></label>
+                <label class="radio-opt warn"><input type="radio" name="l3" value="warn"><div class="radio-btn">!</div><span class="radio-lbl">Attn</span></label>
+                <label class="radio-opt na"><input type="radio" name="l3" value="na"><div class="radio-btn">–</div><span class="radio-lbl">N/A</span></label>
+              </div>
+            </div>
+            <div class="chk-item">
+              <span class="chk-item-label">Turn signals</span>
+              <div class="radio-group">
+                <label class="radio-opt ok"><input type="radio" name="l4" value="ok"><div class="radio-btn">✓</div><span class="radio-lbl">OK</span></label>
+                <label class="radio-opt warn"><input type="radio" name="l4" value="warn"><div class="radio-btn">!</div><span class="radio-lbl">Attn</span></label>
+                <label class="radio-opt na"><input type="radio" name="l4" value="na"><div class="radio-btn">–</div><span class="radio-lbl">N/A</span></label>
+              </div>
+            </div>
+            <div class="chk-item">
+              <span class="chk-item-label">Reverse lights</span>
+              <div class="radio-group">
+                <label class="radio-opt ok"><input type="radio" name="l5" value="ok"><div class="radio-btn">✓</div><span class="radio-lbl">OK</span></label>
+                <label class="radio-opt warn"><input type="radio" name="l5" value="warn"><div class="radio-btn">!</div><span class="radio-lbl">Attn</span></label>
+                <label class="radio-opt na"><input type="radio" name="l5" value="na"><div class="radio-btn">–</div><span class="radio-lbl">N/A</span></label>
+              </div>
+            </div>
+            <div class="notes-row"><span class="notes-lbl">Notes:</span><input type="text" placeholder="..." autocomplete="off"></div>
+          </div>
+
+          <div class="chk-grp">
+            <div class="chk-grp-title">4. Wipers &amp; Windshield</div>
+            <div class="chk-item">
+              <span class="chk-item-label">Wiper blade condition</span>
+              <div class="radio-group">
+                <label class="radio-opt ok"><input type="radio" name="w1" value="ok"><div class="radio-btn">✓</div><span class="radio-lbl">OK</span></label>
+                <label class="radio-opt warn"><input type="radio" name="w1" value="warn"><div class="radio-btn">!</div><span class="radio-lbl">Attn</span></label>
+                <label class="radio-opt na"><input type="radio" name="w1" value="na"><div class="radio-btn">–</div><span class="radio-lbl">N/A</span></label>
+              </div>
+            </div>
+            <div class="chk-item">
+              <span class="chk-item-label">Windshield (chips or cracks)</span>
+              <div class="radio-group">
+                <label class="radio-opt ok"><input type="radio" name="w2" value="ok"><div class="radio-btn">✓</div><span class="radio-lbl">OK</span></label>
+                <label class="radio-opt warn"><input type="radio" name="w2" value="warn"><div class="radio-btn">!</div><span class="radio-lbl">Attn</span></label>
+                <label class="radio-opt na"><input type="radio" name="w2" value="na"><div class="radio-btn">–</div><span class="radio-lbl">N/A</span></label>
+              </div>
+            </div>
+            <div class="notes-row"><span class="notes-lbl">Notes:</span><input type="text" placeholder="..." autocomplete="off"></div>
+          </div>
+
+        </div>
+
+        <!-- RIGHT -->
+        <div>
+
+          <div class="chk-grp">
+            <div class="chk-grp-title">5. Battery (visual only)</div>
+            <div class="chk-item">
+              <span class="chk-item-label">Terminal corrosion</span>
+              <div class="radio-group">
+                <label class="radio-opt ok"><input type="radio" name="b1" value="ok"><div class="radio-btn">✓</div><span class="radio-lbl">OK</span></label>
+                <label class="radio-opt warn"><input type="radio" name="b1" value="warn"><div class="radio-btn">!</div><span class="radio-lbl">Attn</span></label>
+                <label class="radio-opt na"><input type="radio" name="b1" value="na"><div class="radio-btn">–</div><span class="radio-lbl">N/A</span></label>
+              </div>
+            </div>
+            <div class="chk-item">
+              <span class="chk-item-label">Swelling or visible leaks</span>
+              <div class="radio-group">
+                <label class="radio-opt ok"><input type="radio" name="b2" value="ok"><div class="radio-btn">✓</div><span class="radio-lbl">OK</span></label>
+                <label class="radio-opt warn"><input type="radio" name="b2" value="warn"><div class="radio-btn">!</div><span class="radio-lbl">Attn</span></label>
+                <label class="radio-opt na"><input type="radio" name="b2" value="na"><div class="radio-btn">–</div><span class="radio-lbl">N/A</span></label>
+              </div>
+            </div>
+            <div class="notes-row"><span class="notes-lbl">Notes:</span><input type="text" placeholder="..." autocomplete="off"></div>
+          </div>
+
+          <div class="chk-grp">
+            <div class="chk-grp-title">6. Under the Hood</div>
+            <div class="chk-item">
+              <span class="chk-item-label">Belts (visual cracks)</span>
+              <div class="radio-group">
+                <label class="radio-opt ok"><input type="radio" name="h1" value="ok"><div class="radio-btn">✓</div><span class="radio-lbl">OK</span></label>
+                <label class="radio-opt warn"><input type="radio" name="h1" value="warn"><div class="radio-btn">!</div><span class="radio-lbl">Attn</span></label>
+                <label class="radio-opt na"><input type="radio" name="h1" value="na"><div class="radio-btn">–</div><span class="radio-lbl">N/A</span></label>
+              </div>
+            </div>
+            <div class="chk-item">
+              <span class="chk-item-label">Hoses (leaks / visible bulges)</span>
+              <div class="radio-group">
+                <label class="radio-opt ok"><input type="radio" name="h2" value="ok"><div class="radio-btn">✓</div><span class="radio-lbl">OK</span></label>
+                <label class="radio-opt warn"><input type="radio" name="h2" value="warn"><div class="radio-btn">!</div><span class="radio-lbl">Attn</span></label>
+                <label class="radio-opt na"><input type="radio" name="h2" value="na"><div class="radio-btn">–</div><span class="radio-lbl">N/A</span></label>
+              </div>
+            </div>
+            <div class="notes-row"><span class="notes-lbl">Notes:</span><input type="text" placeholder="..." autocomplete="off"></div>
+          </div>
+
+          <div class="chk-grp">
+            <div class="chk-grp-title">7. Under the Vehicle</div>
+            <div class="chk-item">
+              <span class="chk-item-label">Fresh leaks (oil, coolant)</span>
+              <div class="radio-group">
+                <label class="radio-opt ok"><input type="radio" name="u1" value="ok"><div class="radio-btn">✓</div><span class="radio-lbl">OK</span></label>
+                <label class="radio-opt warn"><input type="radio" name="u1" value="warn"><div class="radio-btn">!</div><span class="radio-lbl">Attn</span></label>
+                <label class="radio-opt na"><input type="radio" name="u1" value="na"><div class="radio-btn">–</div><span class="radio-lbl">N/A</span></label>
+              </div>
+            </div>
+            <div class="chk-item">
+              <span class="chk-item-label">Rust on visible critical areas</span>
+              <div class="radio-group">
+                <label class="radio-opt ok"><input type="radio" name="u2" value="ok"><div class="radio-btn">✓</div><span class="radio-lbl">OK</span></label>
+                <label class="radio-opt warn"><input type="radio" name="u2" value="warn"><div class="radio-btn">!</div><span class="radio-lbl">Attn</span></label>
+                <label class="radio-opt na"><input type="radio" name="u2" value="na"><div class="radio-btn">–</div><span class="radio-lbl">N/A</span></label>
+              </div>
+            </div>
+            <div class="chk-item">
+              <span class="chk-item-label">Loose underbody plastic shields</span>
+              <div class="radio-group">
+                <label class="radio-opt ok"><input type="radio" name="u3" value="ok"><div class="radio-btn">✓</div><span class="radio-lbl">OK</span></label>
+                <label class="radio-opt warn"><input type="radio" name="u3" value="warn"><div class="radio-btn">!</div><span class="radio-lbl">Attn</span></label>
+                <label class="radio-opt na"><input type="radio" name="u3" value="na"><div class="radio-btn">–</div><span class="radio-lbl">N/A</span></label>
+              </div>
+            </div>
+            <div class="notes-row"><span class="notes-lbl">Notes:</span><input type="text" placeholder="..." autocomplete="off"></div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 4. PACKAGE & PAYMENT -->
+  <div class="section">
+    <div class="sec-hdr"><span class="sec-num">4</span><span class="sec-title">Package &amp; Payment</span></div>
+    <div class="sec-body">
+
+      <div class="pkg-row">
+        <div class="pkg-card" id="pkg1" onclick="selectPkg(1)">
+          <div class="pkg-hdr">
+            <div class="pkg-num">1</div>
+            <div>
+              <div class="pkg-name">5L OilRight PACKAGE</div>
+              <div class="pkg-price">$119.99</div>
+            </div>
+          </div>
+          <div class="pkg-body">
+            <div class="pkg-desc">Vehicles requiring 5L or less of full synthetic oil. (Civic, Corolla, Elantra, Mazda 3, HR-V, Kicks, Golf…)</div>
+            <div class="pkg-sel"><div class="pkg-check" id="pkchk1"></div> Select this package</div>
+          </div>
+        </div>
+        <div class="pkg-card" id="pkg2" onclick="selectPkg(2)">
+          <div class="pkg-hdr">
+            <div class="pkg-num">2</div>
+            <div>
+              <div class="pkg-name">6L+ OilRight PACKAGE</div>
+              <div class="pkg-price">$139.99</div>
+            </div>
+          </div>
+          <div class="pkg-body">
+            <div class="pkg-desc">Vehicles requiring 6L or more of full synthetic oil. (RAV4, CR-V, F-150, Silverado, RAM 1500, Highlander…)</div>
+            <div class="pkg-sel"><div class="pkg-check" id="pkchk2"></div> Select this package</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="pay-row">
+        <div class="field">
+          <label>Payment Method</label>
+          <div class="pay-methods">
+            <label class="pay-opt"><input type="radio" name="pay" value="etransfer"><div class="pay-btn"></div> E-Transfer</label>
+            <label class="pay-opt"><input type="radio" name="pay" value="cash"><div class="pay-btn"></div> Cash</label>
+            <label class="pay-opt"><input type="radio" name="pay" value="card"><div class="pay-btn"></div> Card</label>
+          </div>
+        </div>
+        <div class="field">
+          <label>Confirmation / Reference No.</label>
+          <input type="text" placeholder="e.g. Interac ref #" autocomplete="off">
+        </div>
+      </div>
+
+      <!-- SIGNATURE -->
+      <div>
+        <div class="sig-label">Client Signature</div>
+        <div class="sig-wrap">
+          <canvas class="sig-canvas" id="sigCanvas"></canvas>
+          <div class="sig-line"></div>
+          <div class="sig-hint" id="sigHint">✏️ Sign here with Apple Pencil<br><span style="font-size:11px;color:#ddd">Tap to begin</span></div>
+          <div class="sig-bar">
+            <div class="sig-bar-left">
+              Thickness: <input type="range" id="penSize" min="1" max="6" value="2" style="width:80px">
+            </div>
+            <button class="sig-clear" onclick="clearSig()">✕ Clear Signature</button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <div class="footer">
+    <div class="footer-l">OilRight – Mobile Service · Greater Moncton, NB<br>This report confirms the completion of the service described above.</div>
+    <div class="footer-r">Thank you for your business!<br><strong style="color:var(--orange)">OilRight</strong></div>
+  </div>
+
+</div>
+
+<script>
+  // PACKAGE
+  function selectPkg(n) {
+    [1,2].forEach(i => {
+      document.getElementById('pkg'+i).classList.remove('selected');
+      document.getElementById('pkchk'+i).textContent = '';
+    });
+    document.getElementById('pkg'+n).classList.add('selected');
+    document.getElementById('pkchk'+n).textContent = '✓';
+  }
+
+  // SIGNATURE
+  const canvas = document.getElementById('sigCanvas');
+  const ctx = canvas.getContext('2d');
+  const hint = document.getElementById('sigHint');
+  let drawing = false, hasSig = false;
+
+  function resize() {
+    const r = canvas.getBoundingClientRect();
+    const dpr = window.devicePixelRatio || 1;
+    const saved = hasSig ? canvas.toDataURL() : null;
+    canvas.width = r.width * dpr;
+    canvas.height = r.height * dpr;
+    ctx.scale(dpr, dpr);
+    ctx.strokeStyle = '#1a1a1a';
+    ctx.lineJoin = 'round';
+    ctx.lineCap = 'round';
+    if (saved) {
+      const img = new Image();
+      img.onload = () => ctx.drawImage(img, 0, 0, r.width, r.height);
+      img.src = saved;
+    }
+  }
+
+  function pos(e) {
+    const r = canvas.getBoundingClientRect();
+    const src = e.touches ? e.touches[0] : e;
+    return { x: src.clientX - r.left, y: src.clientY - r.top };
+  }
+
+  function start(e) {
+    e.preventDefault();
+    drawing = true;
+    const p = pos(e);
+    ctx.beginPath(); ctx.moveTo(p.x, p.y);
+    if (!hasSig) { hint.style.display = 'none'; hasSig = true; }
+  }
+  function move(e) {
+    if (!drawing) return;
+    e.preventDefault();
+    const p = pos(e);
+    ctx.lineWidth = document.getElementById('penSize').value;
+    ctx.lineTo(p.x, p.y); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(p.x, p.y);
+  }
+  function stop() { drawing = false; ctx.beginPath(); }
+
+  function clearSig() {
+    const r = canvas.getBoundingClientRect();
+    ctx.clearRect(0, 0, r.width, r.height);
+    hasSig = false; hint.style.display = '';
+  }
+
+  canvas.addEventListener('pointerdown', start, { passive: false });
+  canvas.addEventListener('pointermove', move, { passive: false });
+  canvas.addEventListener('pointerup', stop);
+  canvas.addEventListener('pointercancel', stop);
+  canvas.addEventListener('touchstart', start, { passive: false });
+  canvas.addEventListener('touchmove', move, { passive: false });
+  canvas.addEventListener('touchend', stop);
+
+  window.addEventListener('resize', resize);
+  setTimeout(resize, 100);
+
+  // CLEAR ALL
+  function clearAll() {
+    if (!confirm('Clear the entire form?')) return;
+    document.querySelectorAll('input[type="text"], input[type="date"]').forEach(el => el.value = '');
+    document.querySelectorAll('input[type="radio"]').forEach(el => el.checked = false);
+    [1,2].forEach(i => { document.getElementById('pkg'+i).classList.remove('selected'); document.getElementById('pkchk'+i).textContent = ''; });
+    clearSig();
+  }
+</script>
+</body>
+</html>
